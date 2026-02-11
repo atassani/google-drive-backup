@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/index.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "bridge": "tsx src/bridge.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

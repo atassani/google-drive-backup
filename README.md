@@ -43,7 +43,31 @@ npm run dev -- info https://docs.google.com/presentation/d/1FA_PMVPDjjI7qNkWoXqG
 npm run dev -- backup <fileId|url>
 ```
 
-This preserves native Google formats. For Slides, it uses an Apps Script function to copy slides into a new presentation (the file is created by Destination in the shared Ocado folder, then Origin runs the script). For Docs/Sheets it copies the file directly. Set `APPS_SCRIPT_ID` in `.env`. `DESTINATION_EMAIL` is only required for Docs/Sheets.
+This preserves native Google formats. For Slides and Docs, it uses Apps Script functions to copy content into a new file (created by Destination in the shared Ocado folder, then Origin runs the script). For Sheets it copies the file directly. Set `APPS_SCRIPT_ID` in `.env`. `DESTINATION_EMAIL` is only required for Sheets.
+
+## Chrome Extension + Local Bridge
+
+This lets you select a file in the Drive list (without opening it) and click the extension button to trigger backup.
+
+1. Start the bridge:
+
+```bash
+npm run bridge
+```
+
+2. Load the extension in Chrome:
+   - Go to `chrome://extensions`
+   - Enable **Developer mode**
+   - Click **Load unpacked**
+   - Select `/Users/toni.tassani/code/google-drive-backup/extension`
+
+3. In Google Drive, select one or more files in the list and click the extension icon (or right-click → “Backup selected in Drive”).
+
+Optional security: set `BRIDGE_TOKEN` in `.env`, and then in the extension background you can store it via DevTools:
+
+```js
+chrome.storage.local.set({ bridgeToken: "YOUR_TOKEN" })
+```
 
 ## Apps Script setup (Slides only)
 

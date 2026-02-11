@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Drive Backup Trigger",
+  "version": "0.1.0",
+  "description": "Trigger local Drive backup for selected files.",
+  "action": {
+    "default_title": "Backup Selected Drive File(s)",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["activeTab", "scripting", "storage", "contextMenus"],
+  "host_permissions": [
+    "https://drive.google.com/*",
+    "http://127.0.0.1:8765/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://drive.google.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
