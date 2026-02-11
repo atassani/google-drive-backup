@@ -72,3 +72,35 @@ function copySlidesInto(originId, destId) {
 
   return { copied: slides.length };
 }
+
+function copySheetsInto(originId, destId) {
+  if (!originId || !destId) {
+    throw new Error('originId and destId are required');
+  }
+
+  var origin = SpreadsheetApp.openById(originId);
+  var dest = SpreadsheetApp.openById(destId);
+
+  var destSheets = dest.getSheets();
+  var defaultSheet = destSheets[0];
+
+  var originSheets = origin.getSheets();
+  for (var i = 0; i < originSheets.length; i++) {
+    var sheet = originSheets[i];
+    var copied = sheet.copyTo(dest);
+    var name = sheet.getName();
+    var finalName = name;
+    var suffix = 1;
+    while (dest.getSheetByName(finalName)) {
+      suffix++;
+      finalName = name + ' (' + suffix + ')';
+    }
+    copied.setName(finalName);
+  }
+
+  if (defaultSheet) {
+    dest.deleteSheet(defaultSheet);
+  }
+
+  return { copied: originSheets.length };
+}

@@ -43,7 +43,7 @@ npm run dev -- info https://docs.google.com/presentation/d/1FA_PMVPDjjI7qNkWoXqG
 npm run dev -- backup <fileId|url>
 ```
 
-This preserves native Google formats. For Slides and Docs, it uses Apps Script functions to copy content into a new file (created by Destination in the shared Ocado folder, then Origin runs the script). For Sheets it copies the file directly. Set `APPS_SCRIPT_ID` in `.env`. `DESTINATION_EMAIL` is only required for Sheets.
+This preserves native Google formats. For Slides, Docs, and Sheets, it uses Apps Script functions to copy content into a new file (created by Destination in the shared Ocado folder, then Origin runs the script). For non-Google files, it downloads from Origin and uploads to Destination; resumable uploads are used above `BINARY_RESUMABLE_THRESHOLD_MB`. Set `APPS_SCRIPT_ID` in `.env`.
 
 ## Chrome Extension + Local Bridge
 
