@@ -1,6 +1,6 @@
-# Google Drive Backup CLI (Scaffold)
+# Google Drive Backup CLI
 
-Local CLI scaffolding that authenticates two Google Drive accounts (origin + destination) and can print basic metadata for a file in the origin account.
+Local CLI that authenticates two Google Drive accounts (origin + destination) and backs up files between them.
 
 ## Setup
 
@@ -69,7 +69,7 @@ Optional security: set `BRIDGE_TOKEN` in `.env`, and then in the extension backg
 chrome.storage.local.set({ bridgeToken: "YOUR_TOKEN" })
 ```
 
-## Apps Script setup (Slides only)
+## Apps Script setup (Slides, Docs, Sheets)
 
 1. Create a new Apps Script project (standalone).
 2. Replace the script with `/Users/toni.tassani/code/google-drive-backup/apps-script/Code.gs`.
