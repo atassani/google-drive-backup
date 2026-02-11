@@ -60,11 +60,19 @@ function getSelectedFiles() {
 
   const url = window.location.href;
   const match = url.match(/\/d\/([\w-]{20,})/);
-  if (match) return [{ id: match[1], name: "(current file)" }];
+  if (match) {
+    const title = document.title || "(current file)";
+    const name = title.replace(/\s*-\s*Google\s+(Docs|Slides|Sheets)\s*$/i, "").trim();
+    return [{ id: match[1], name: name || "(current file)" }];
+  }
 
   const q = new URLSearchParams(window.location.search);
   const idParam = q.get("id");
-  if (idParam) return [{ id: idParam, name: "(current file)" }];
+  if (idParam) {
+    const title = document.title || "(current file)";
+    const name = title.replace(/\s*-\s*Google\s+(Docs|Slides|Sheets)\s*$/i, "").trim();
+    return [{ id: idParam, name: name || "(current file)" }];
+  }
 
   return [];
 }
