@@ -7,9 +7,9 @@ function usage() {
   console.log(`\nUsage:
   npm run dev -- auth <origin|destination>
   npm run dev -- whoami <origin|destination>
-  npm run dev -- info <fileId|url>
+  npm run dev -- info <itemId|url>
   npm run dev -- ping-script
-  npm run dev -- backup <fileId|url>
+  npm run dev -- backup <itemId|url>
 `);
 }
 
@@ -61,7 +61,7 @@ async function main() {
   if (command === "info") {
     const input = rest[0];
     if (!input) {
-      console.error("Provide a file ID or URL.");
+      console.error("Provide a file or folder ID (or URL).");
       process.exit(1);
     }
     const fileId = parseFileId(input);
@@ -132,7 +132,7 @@ async function main() {
   if (command === "backup") {
     const input = rest[0];
     if (!input) {
-      console.error("Provide a file ID or URL.");
+      console.error("Provide a file or folder ID (or URL).");
       process.exit(1);
     }
     const fileId = parseFileId(input);
