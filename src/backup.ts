@@ -48,6 +48,10 @@ function fileMime(file: drive_v3.Schema$File) {
   return file.mimeType ?? undefined;
 }
 
+function shortcutTargetId(file: drive_v3.Schema$File) {
+  return file.shortcutDetails?.targetId ?? undefined;
+}
+
 async function createBackupContext(): Promise<BackupContext> {
   const originAuth = await authorize("origin");
   const destAuth = await authorize("destination");
@@ -124,10 +128,6 @@ async function backupSingleFileByMetadata(
   const name = fileName(originFile);
   const mimeType = fileMime(originFile);
   const sizeBytes = originFile.size ? Number(originFile.size) : 0;
-
-  if (mimeType === DRIVE_SHORTCUT_MIME) {
-    throw new Error(`Shortcuts are not supported yet: ${name}`);
-  }
 
   let type: SupportedType | "binary";
   try {
@@ -285,7 +285,8 @@ async function backupFolderByMetadata(
   do {
     const list = await ctx.originDrive.files.list({
       q: `'${folderId}' in parents and trashed = false`,
-      fields: "nextPageToken,files(id,name,mimeType,size)",
+      fields:
+        "nextPageToken,files(id,name,mimeType,size,shortcutDetails(targetId,targetMimeType))",
       includeItemsFromAllDrives: true,
       supportsAllDrives: true,
       pageToken,
@@ -308,9 +309,39 @@ async function backupNodeByMetadata(
   ctx: BackupContext,
   originItem: drive_v3.Schema$File,
   targetParentId: string,
-  depth: number
+  depth: number,
+  resolutionChain: Set<string> = new Set()
 ): Promise<string> {
   const mimeType = fileMime(originItem);
+  const indent = "  ".repeat(depth);
+
+  if (mimeType === DRIVE_SHORTCUT_MIME) {
+    const shortcutId = originItem.id ?? undefined;
+    const shortcutName = fileName(originItem);
+    const targetId = shortcutTargetId(originItem);
+    if (!targetId) {
+      throw new Error(`Shortcut target id is missing: ${shortcutName}`);
+    }
+
+    if (resolutionChain.has(targetId)) {
+      throw new Error(
+        `Shortcut cycle detected at target ${targetId} (from shortcut: ${shortcutName})`
+      );
+    }
+
+    const nextChain = new Set(resolutionChain);
+    if (shortcutId) {
+      nextChain.add(shortcutId);
+    }
+    console.log(`${indent}Shortcut: ${shortcutName} -> ${targetId}`);
+    const target = await ctx.originDrive.files.get({
+      fileId: targetId,
+      fields: "id,name,mimeType,size,shortcutDetails(targetId,targetMimeType)",
+      supportsAllDrives: true,
+    });
+    return backupNodeByMetadata(ctx, target.data, targetParentId, depth, nextChain);
+  }
+
   if (mimeType === DRIVE_FOLDER_MIME) {
     return backupFolderByMetadata(ctx, originItem, targetParentId, depth);
   }
@@ -321,7 +352,7 @@ export async function backupFile(fileId: string): Promise<string> {
   const ctx = await createBackupContext();
   const root = await ctx.originDrive.files.get({
     fileId,
-    fields: "id,name,mimeType,size",
+    fields: "id,name,mimeType,size,shortcutDetails(targetId,targetMimeType)",
     supportsAllDrives: true,
   });
 
